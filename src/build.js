@@ -7,6 +7,7 @@ var nonRelativeImports = /import(\s*{?[a-zA-Z0-9_\*\,\s]+}?)?(\s*as\s*[a-zA-Z0-9
 var importGrouper = /import\s*{([a-zA-Z0-9_\,\s]+)}\s*from\s*'([a-zA-Z0-9\-]+)'\s*;\s*/;
 var fixA = /import\s*([a-zA-Z0-9_\,$\s]+)\s*from\s*'([a-zA-Z0-9\-]+)'\s*;\s*/g;
 var fixB = /import\s*'([a-zA-Z0-9\-./\\]+)'\s*;\s*/g;
+var fixC = /import(\s*?[a-zA-Z0-9_\*\,\s]+?)?(\s*as\s*[a-zA-Z0-9$]+)?(\s*from)?\s*'[a-zA-Z0-9\-]+';\s*/g;
 
 exports.sortFiles = function sortFiles() {
   var edges = [];
@@ -67,8 +68,14 @@ exports.extractImports = function(content, importsToAdd){
     matchesToKeep.forEach(function(toKeep){ importsToAdd.push(toKeep) });
   }
 
+  matchesToKeep = content.match(fixC);
+  if(matchesToKeep){
+    matchesToKeep.forEach(function(toKeep){ importsToAdd.push(toKeep) });
+  }
+
   content = content.replace(fixA, '');
   content = content.replace(fixB, '');
+  content = content.replace(fixC, '');
   content = content.replace(nonRelativeImports, '');
   content = content.replace(relativeImports, '');
 
